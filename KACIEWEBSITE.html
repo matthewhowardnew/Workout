@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kacie's Fitness Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right bottom, #f0e3c5, #e5d2a7);
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #4a4a4a;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin: 20px 0 10px;
+            color: #4a4a4a;
+        }
+
+        p {
+            font-size: 1.5em;
+            margin: 0 0 30px;
+        }
+
+        iframe {
+            width: 100%;
+            max-width: 560px;
+            height: 315px;
+            border: none;
+            margin: 20px auto;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        input {
+            font-size: 1.2em;
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            background-color: #fff;
+            color: #333;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #ddd;
+        }
+
+        .total {
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #4a4a4a;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kacie's Fitness Plan</h1>
+    
+    <div class="controls">
+        <input type="number" id="caloriesInput" placeholder="Enter Calories">
+        <button onclick="addToTotal()">Add / Subtract</button>
+    </div>
+    <div class="total">
+        Total: <span id="total">0</span> / 1,450 Calories
+    </div>
+
+    <h2>MORNING-AFTERNOON</h2>
+    <iframe src="https://www.youtube.com/embed/2haf-ZqA808?si=Z4NaZat8RbBMAnCP" allowfullscreen></iframe>
+
+    <h2>NIGHT</h2>
+    <iframe src="https://www.youtube.com/embed/Tnghtjt91DY?si=nMbiBEs7yvdFNdG6" allowfullscreen></iframe>
+
+    <script>
+        let total = 0;
+
+        // Load saved total from localStorage if available
+        if (localStorage.getItem('calorieTotal')) {
+            total = parseInt(localStorage.getItem('calorieTotal'));
+        }
+
+        function addToTotal() {
+            let input = parseInt(document.getElementById('caloriesInput').value);
+            if (!isNaN(input)) {
+                total += input;
+                if (total < 0) total = 0;
+                if (total > 1450) total = 1450;
+                updateTotal();
+                saveTotal();
+            }
+            document.getElementById('caloriesInput').value = '';
+        }
+
+        function updateTotal() {
+            document.getElementById('total').textContent = total;
+        }
+
+        function saveTotal() {
+            localStorage.setItem('calorieTotal', total);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTotal();
+        });
+    </script>
+</body>
+</html>
