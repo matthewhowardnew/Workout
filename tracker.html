@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie and Weight Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        label, input {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 5px 10px;
+            margin-top: 10px;
+        }
+        .entry, .weight-entry, .calorie-history {
+            margin-bottom: 20px;
+        }
+        .history {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h2>Calorie Tracker</h2>
+    <div class="entry">
+        <label for="label">Label:</label>
+        <input type="text" id="label" placeholder="e.g., Spaghetti">
+        
+        <label for="calories">Calories:</label>
+        <input type="number" id="calories" placeholder="e.g., 800">
+        
+        <button onclick="addCalorieEntry()">Add Entry</button>
+        
+        <h3 id="calorie-status">0/2000 calories</h3>
+        <ul id="calorie-list"></ul>
+    </div>
+    
+    <div class="calorie-history">
+        <h3>Calorie History</h3>
+        <table id="calorie-table">
+            <tr>
+                <th>Date</th>
+                <th>Total Calories</th>
+            </tr>
+        </table>
+    </div>
+
+    <h2>Weight Tracker</h2>
+    <div class="weight-entry">
+        <label for="weight">Weight (lbs):</label>
+        <input type="number" id="weight" placeholder="e.g., 150">
+        
+        <button onclick="addWeightEntry()">Add Weight</button>
+        
+        <div class="history">
+            <h3>Weight History</h3>
+            <table id="weight-table">
+                <tr>
+                    <th>Date</th>
+                    <th>Weight (lbs)</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const calorieGoal = 2000;
+        let calorieEntries = JSON.parse(localStorage.getItem('calorieEntries')) || [];
+        let calorieSum = localStorage.getItem('calorieSum') || 0;
+        let currentDate = new Date().toLocaleDateString();
+        let lastSavedDate = localStorage.getItem('lastSavedDate') || currentDate;
+        
+        function updateCalorieStatus() {
+            document.getElementById('calorie-status').innerText = `/ calories`;
+            const list = document.getElementById('calorie-list');
+            list.innerHTML = '';
+            calorieEntries.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `:  calories`;
+                list.appendChild(li);
+            });
+        }
+
+        function resetDailyCalories() {
+            if (lastSavedDate !== currentDate) {
+                saveCalorieHistory();
+                calorieEntries = [];
+                calorieSum = 0;
+                localStorage.setItem('calorieEntries', JSON.stringify(calorieEntries));
+                localStorage.setItem('calorieSum', calorieSum);
+                lastSavedDate = currentDate;
+                localStorage.setItem('lastSavedDate', lastSavedDate);
+            }
+        }
+
+        function saveCalorieHistory() {
+            const calorieHistory = JSON.parse(localStorage.getItem('calorieHistory')) || [];
+            calorieHistory.push({ date: lastSavedDate, totalCalories: calorieSum });
+            localStorage.setItem('calorieHistory', JSON.stringify(calorieHistory));
+            updateCalorieTable();
+        }
+
+        function addCalorieEntry() {
+            const label = document.getElementById('label').value;
+            const calories = parseInt(document.getElementById('calories').value);
+
+            if (label && !isNaN(calories)) {
+                calorieEntries.push({ label, calories });
+                calorieSum = parseInt(calorieSum) + calories;
+                localStorage.setItem('calorieEntries', JSON.stringify(calorieEntries));
+                localStorage.setItem('calorieSum', calorieSum);
+                updateCalorieStatus();
+            }
+        }
+
+        function addWeightEntry() {
+            const weight = document.getElementById('weight').value;
+            if (weight) {
+                const weightData = JSON.parse(localStorage.getItem('weightData')) || [];
+                const entry = { date: new Date().toLocaleDateString(), weight };
+                weightData.push(entry);
+                localStorage.setItem('weightData', JSON.stringify(weightData));
+                updateWeightTable();
+            }
+        }
+
+        function updateCalorieTable() {
+            const calorieHistory = JSON.parse(localStorage.getItem('calorieHistory')) || [];
+            const table = document.getElementById('calorie-table');
+            table.innerHTML = `<tr>
+                                <th>Date</th>
+                                <th>Total Calories</th>
+                            </tr>`;
+            calorieHistory.forEach(entry => {
+                const row = table.insertRow();
+                const dateCell = row.insertCell(0);
+                const calorieCell = row.insertCell(1);
+                dateCell.textContent = entry.date;
+                calorieCell.textContent = entry.totalCalories;
+            });
+        }
+
+        function updateWeightTable() {
+            const weightData = JSON.parse(localStorage.getItem('weightData')) || [];
+            const table = document.getElementById('weight-table');
+            table.innerHTML = `<tr>
+                                <th>Date</th>
+                                <th>Weight (lbs)</th>
+                            </tr>`;
+            weightData.forEach(entry => {
+                const row = table.insertRow();
+                const dateCell = row.insertCell(0);
+                const weightCell = row.insertCell(1);
+                dateCell.textContent = entry.date;
+                weightCell.textContent = entry.weight;
+            });
+        }
+
+        resetDailyCalories();
+        updateCalorieStatus();
+        updateCalorieTable();
+        updateWeightTable();
+    </script>
+</body>
+</html>
